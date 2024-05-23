@@ -47,5 +47,11 @@ class ImageProcessor:
                     elif b<10 and g>180 and r>190:
                         amarillo+=1
         
-        #falta terminar
-        
+        if  rojo > 1 and (rojo + blanco) > (negro + amarillo) and blanco > rojo and blanco > negro: 
+            return "F"
+        elif negro > 1 and (blanco + negro) > (amarillo + rojo) and blanco > negro:
+            return "P"
+        elif negro > 1 and (blanco + negro) > (amarillo + rojo): # b< 120 n <25
+            return "C"
+        elif amarillo > 1 and (rojo + amarillo) > (negro + blanco):
+            return "O"   
