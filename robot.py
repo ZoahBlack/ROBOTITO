@@ -10,6 +10,8 @@ MAX_VEL = 3.14 # Reduzco la velocidad para minimizar desvío
 class Robot:
     def __init__(self):
         self.robot = WebotsRobot()
+
+        self.emitter=self.robot.getDevice("emitter")
         
         self.wheelL = self.robot.getDevice("wheel1 motor") 
         self.wheelL.setPosition(float("inf"))
@@ -50,11 +52,18 @@ class Robot:
         self.updateVars()
         return result
     
+    def delay(self, ms):
+        initTime = self.robot.getTime()
+        while self.robot.step(TIME_STEP) != -1:
+            if (self.robot.getTime() - initTime) * 1000.0 >= ms:
+                break
+
     def updateVars(self):
         self.updatePosition()
         self.updateRotation()
         self.updateRangeImage()
-        print(f"Position: {self.position}, Rotation: {self.rotation:.3f} rad ({self.rotation*180/math.pi:.3f} deg)")
+        self.updateCapturarImage()
+        print(f"Position: {self.position}, Rotation: {self.rotation:.3f} rad ({self.rotation*180/math.pi:.3f} deg), Victim or Sign: {self.letra}")
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
@@ -66,7 +75,27 @@ class Robot:
 
     def updateRangeImage(self):
         self.rangeImage = self.lidar.getRangeImage()[1024:1536]
-    
+
+    def updateCapturarImage(self):
+        self.imageProcessor.analyze(self.camI.getImageArray())
+        self.imageProcessor.analyze(self.camD.getImageArray())
+        return self.imageProcessor.victima_o_cartel()
+
+    def enviarMensaje(self, pos1, pos2):
+        self.letra = self.updateCapturarImage()
+        let=bytes(self.letra, 'utf-8')
+        mensaje=struct.pack("i i c", pos1, pos2, let)
+        self.emitter.send(mensaje)
+
+    def parar(self):
+        self.wheelL.setVelocity(0)
+        self.wheelR.setVelocity(0)
+
+    def enviarMensajeVoC(self, tipo):
+        self.parar()
+        self.delay(1200)
+        self.enviarMensaje(int(self.position["x"]*100), int(self.position["y"]*100), tipo)
+
     def girar(self, rad):
         lastRot = self.rotation
         deltaRot = 0
@@ -110,7 +139,7 @@ class Robot:
         
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
-        
+
     def hayAlgoIzquierda(self):
         leftDist = self.rangeImage[128]
         return leftDist < 0.08
