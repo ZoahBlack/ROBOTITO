@@ -6,7 +6,7 @@ class ImageProcessor:
     def analyze(self, image):
         self.image = image
 
-    def victima_o_cartel(self, procesar):
+    def victima_o_cartel(self):
         gris = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         ret, thresh=cv2.threshold(gris, 140, 255, cv2.THRESH_BINARY)
         contornos, jerarquia = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
