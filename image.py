@@ -15,29 +15,7 @@ class ImageProcessor:
         angulo=approx[2]
 
         if len(contornos) == 1 and len(contornos[0] <= 10):
-            x = int(approx[0][0])
-            y = int(approx[0][1])
-            mitad_ancho = int(approx[1][0] / 2)
-            mitad_alto = int(approx[1][1] / 2)
-            
-            # Recortar la región del cartel
-            rect = thresh[y - mitad_alto:y + mitad_alto, x - mitad_ancho:x + mitad_ancho]
-            
-            # Calcular el porcentaje de píxeles negros en las regiones superior e inferior
-            tamanio = rect.shape[0] * rect.shape[1]
-            pixeles_negros = np.count_nonzero(rect == 0)
-            porcentaje_negros = pixeles_negros / tamanio
-            
-            cuadrito_arriba = thresh[y - mitad_alto:y - int(mitad_alto / 3), x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
-            cuadrito_abajo = thresh[y + int(mitad_alto / 3):y + mitad_alto, x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
-            
-            # Determinar la letra
-            if np.count_nonzero(cuadrito_arriba == 0) / cuadrito_arriba.size < 0.2 and np.count_nonzero(cuadrito_abajo == 0) / cuadrito_abajo.size < 0.2:
-                return "H"
-            elif np.count_nonzero(cuadrito_arriba == 0) / cuadrito_arriba.size < 0.2 and np.count_nonzero(cuadrito_abajo == 0) / cuadrito_abajo.size >= 0.2:
-                return "U"
-            elif np.count_nonzero(cuadrito_arriba == 0) / cuadrito_arriba.size >= 0.2 and np.count_nonzero(cuadrito_abajo == 0) / cuadrito_abajo.size >= 0.2:
-                return "S"
+            #victima code
             
         elif abs(angulo) == 45 and len(contornos) == 1:
             alto, ancho=thresh.shape[0], thresh.shape[1]
