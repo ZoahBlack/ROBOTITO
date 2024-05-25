@@ -14,12 +14,7 @@ class ImageProcessor:
         approx=cv2.minAreaRect(contornos[0])
         angulo=approx[2]
 
-        if len(contornos) == 1 and len(contornos[0] <= 10):
-
-            approx = cv2.minAreaRect(contornos[0])
-            angulo = approx[2]
-        
-        if angulo % 90 == 0:
+        if len(contornos) == 1 and len(contornos[0]) <= 10 and angulo % 90 == 0:
             x = int(approx[0][0])
             y = int(approx[0][1])
             mitad_ancho = int(approx[1][0] / 2)
@@ -30,7 +25,7 @@ class ImageProcessor:
             tamanio = rect.shape[0] * rect.shape[1]
             pixeles_negros = np.count_nonzero(rect == 0)
             porcentaje_negros = pixeles_negros / tamanio
-            
+                
             cuadrito_arriba = thresh[y - mitad_alto:y - int(mitad_alto / 3), x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
             cuadrito_abajo = thresh[y + int(mitad_alto / 3):y + mitad_alto, x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
 
@@ -40,9 +35,6 @@ class ImageProcessor:
                 return "U"
             elif np.count_nonzero(cuadrito_arriba == 0) / cuadrito_arriba.size >= 0.2 and np.count_nonzero(cuadrito_abajo == 0) / cuadrito_abajo.size >= 0.2:
                 return "S"
-
-            return None
-            
         elif abs(angulo) == 45 and len(contornos) == 1:
             alto, ancho=thresh.shape[0], thresh.shape[1]
             M=cv2.getRotationMatrix2D((ancho/2,alto/2),angulo,1)
@@ -81,3 +73,4 @@ class ImageProcessor:
             return "C"
         elif amarillo > 1 and (rojo + amarillo) > (negro + blanco):
             return "O"   
+
