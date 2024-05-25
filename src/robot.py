@@ -1,7 +1,8 @@
 import math
-import utils
-from point import Point
-from image import ImageProcessor
+import src.utils as utils
+import struct
+from src.point import Point
+from src.image import ImageProcessor
 from controller import Robot as WebotsRobot
 
 TIME_STEP = 16
@@ -63,7 +64,7 @@ class Robot:
         self.updateRotation()
         self.updateRangeImage()
         self.updateCapturarImage()
-        print(f"Position: {self.position}, Rotation: {self.rotation:.3f} rad ({self.rotation*180/math.pi:.3f} deg), Victim or Sign: {self.letra}")
+        print(f"Position: {self.position}, Rotation: {self.rotation:.3f} rad ({self.rotation*180/math.pi:.3f} deg)")
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
@@ -78,12 +79,17 @@ class Robot:
 
     def updateCapturarImage(self):
         self.imageProcessor.analyze(self.camI.getImageArray())
+        self.letraIZ = self.imageProcessor.victima_o_cartel()
         self.imageProcessor.analyze(self.camD.getImageArray())
-        return self.imageProcessor.victima_o_cartel()
+        self.letraDR = self.imageProcessor.victima_o_cartel()
+        
+        if self.letraIZ != None:
+            self.enviarMensajeVoC(self.letraIZ)
+        elif self.letraDR != None:
+            self.enviarMensajeVoC(self.letraDR)
 
-    def enviarMensaje(self, pos1, pos2):
-        self.letra = self.updateCapturarImage()
-        let=bytes(self.letra, 'utf-8')
+    def enviarMensaje(self, pos1, pos2, letra):
+        let=bytes(letra, 'utf-8')
         mensaje=struct.pack("i i c", pos1, pos2, let)
         self.emitter.send(mensaje)
 
@@ -91,10 +97,10 @@ class Robot:
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
 
-    def enviarMensajeVoC(self, tipo):
+    def enviarMensajeVoC(self, letra):
         self.parar()
         self.delay(1200)
-        self.enviarMensaje(int(self.position["x"]*100), int(self.position["y"]*100), tipo)
+        self.enviarMensaje(int(self.position["x"]*100), int(self.position["y"]*100), letra)
 
     def girar(self, rad):
         lastRot = self.rotation
