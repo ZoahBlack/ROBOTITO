@@ -1,8 +1,8 @@
 import math
-import src.utils as utils
+import utils as utils
 import struct
-from src.point import Point
-from src.image import ImageProcessor
+from point import Point
+from image import ImageProcessor
 from controller import Robot as WebotsRobot
 
 TIME_STEP = 16
