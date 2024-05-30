@@ -1,7 +1,5 @@
 from robot import Robot
 
-print("Hola mundo")
-
 robot = Robot() 
 
 while robot.step() != -1:
