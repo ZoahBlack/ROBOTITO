@@ -10,6 +10,9 @@ class ImageProcessor:
         gris = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         ret, thresh=cv2.threshold(gris, 140, 255, cv2.THRESH_BINARY)
         contornos, jerarquia = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if len(contornos) == 0:
+            return None
+        
         imagen = cv2.drawContours(self.image, contornos, -1, (0, 0, 255), 1)
         approx=cv2.minAreaRect(contornos[0])
         angulo=approx[2]
@@ -23,11 +26,16 @@ class ImageProcessor:
             rect = thresh[y - mitad_alto:y + mitad_alto, x - mitad_ancho:x + mitad_ancho]
 
             tamanio = rect.shape[0] * rect.shape[1]
+            if tamanio == 0: return None
+            
             pixeles_negros = np.count_nonzero(rect == 0)
             porcentaje_negros = pixeles_negros / tamanio
                 
             cuadrito_arriba = thresh[y - mitad_alto:y - int(mitad_alto / 3), x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
             cuadrito_abajo = thresh[y + int(mitad_alto / 3):y + mitad_alto, x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
+
+            if cuadrito_abajo.size == 0: return None
+            if cuadrito_arriba.size == 0: return None
 
             if np.count_nonzero(cuadrito_arriba == 0) / cuadrito_arriba.size < 0.2 and np.count_nonzero(cuadrito_abajo == 0) / cuadrito_abajo.size < 0.2:
                 return "H"
@@ -65,12 +73,12 @@ class ImageProcessor:
                     elif b<10 and g>180 and r>190:
                         amarillo+=1
         
-        if  rojo > 1 and (rojo + blanco) > (negro + amarillo) and blanco > rojo and blanco > negro: 
-            return "F"
-        elif negro > 1 and (blanco + negro) > (amarillo + rojo) and blanco > negro:
-            return "P"
-        elif negro > 1 and (blanco + negro) > (amarillo + rojo): # b< 120 n <25
-            return "C"
-        elif amarillo > 1 and (rojo + amarillo) > (negro + blanco):
-            return "O"   
+            if  rojo > 1 and (rojo + blanco) > (negro + amarillo) and blanco > rojo and blanco > negro: 
+                return "F"
+            elif negro > 1 and (blanco + negro) > (amarillo + rojo) and blanco > negro:
+                return "P"
+            elif negro > 1 and (blanco + negro) > (amarillo + rojo): # b< 120 n <25
+                return "C"
+            elif amarillo > 1 and (rojo + amarillo) > (negro + blanco):
+                return "O"   
 

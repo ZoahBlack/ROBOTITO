@@ -1,6 +1,7 @@
 import math
 import utils as utils
 import struct
+import numpy as np
 from point import Point
 from image import ImageProcessor
 from controller import Robot as WebotsRobot
@@ -79,10 +80,19 @@ class Robot:
     def updateRangeImage(self):
         self.rangeImage = self.lidar.getRangeImage()[1024:1536]
 
+    def convertirCamara(self, imagen, alto, ancho): #Convierte la imagen de la camara a una imagen de opencv
+        return np.array(np.frombuffer(imagen, np.uint8).reshape((alto,ancho, 4)))
+
+    def getCamImage(self, camera):
+        img = camera.getImage()
+        w = camera.getWidth()
+        h = camera.getHeight()
+        return self.convertirCamara(img, h, w)
+
     def updateCapturarImage(self):
-        self.imageProcessor.analyze(self.camI.getImageArray())
+        self.imageProcessor.analyze(self.getCamImage(self.camI))
         self.letraIZ = self.imageProcessor.victima_o_cartel()
-        self.imageProcessor.analyze(self.camD.getImageArray())
+        self.imageProcessor.analyze(self.getCamImage(self.camD))
         self.letraDR = self.imageProcessor.victima_o_cartel()
         
         if self.letraIZ != None:
@@ -102,7 +112,7 @@ class Robot:
     def enviarMensajeVoC(self, letra):
         self.parar()
         self.delay(1200)
-        self.enviarMensaje(int(self.position["x"]*100), int(self.position["y"]*100), letra)
+        self.enviarMensaje(int(self.position.x*100), int(self.position.y*100), letra)
 
     def girar(self, rad):
         lastRot = self.rotation
