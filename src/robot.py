@@ -8,8 +8,6 @@ from controller import Robot as WebotsRobot
 TIME_STEP = 16
 MAX_VEL = 3.14 # Reduzco la velocidad para minimizar desvío
 
-print("Hola mundo")
-
 class Robot:
     def __init__(self):
         self.robot = WebotsRobot()
