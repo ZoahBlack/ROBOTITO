@@ -65,7 +65,7 @@ class Robot:
         self.updateRotation()
         self.updateRangeImage()
         self.updateCapturarImage()
-        print(f"Position: {self.position}, Rotation: {self.rotation:.3f} rad ({self.rotation*180/math.pi:.3f} deg)")
+        print(f"Position: {self.position}, Rotation: {self.rotation:.3f} rad ({self.rotation*180/math.pi:.3f} deg), Image: {self.updateCapturarImage()}")
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
@@ -94,9 +94,11 @@ class Robot:
         self.letraDR = self.imageProcessor.victima_o_cartel()
         
         if self.letraIZ != None:
-            self.enviarMensajeVoC(self.letraIZ)
+            return self.enviarMensajeVoC(self.letraIZ)
         elif self.letraDR != None:
-            self.enviarMensajeVoC(self.letraDR)
+            return self.enviarMensajeVoC(self.letraDR)
+        else:
+            return None
 
     def enviarMensaje(self, pos1, pos2, letra):
         let=bytes(letra, 'utf-8')
