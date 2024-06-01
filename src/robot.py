@@ -65,7 +65,7 @@ class Robot:
         self.updateRotation()
         self.updateRangeImage()
         self.updateCapturarImage()
-        print(f"Position: {self.position}, Rotation: {self.rotation:.3f} rad ({self.rotation*180/math.pi:.3f} deg), Image: {self.updateCapturarImage()}")
+        #print(f"Position: {self.position}, Rotation: {self.rotation:.3f} rad ({self.rotation*180/math.pi:.3f} deg)")
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
@@ -94,16 +94,15 @@ class Robot:
         self.letraDR = self.imageProcessor.victima_o_cartel()
         
         if self.letraIZ != None:
-            return self.enviarMensajeVoC(self.letraIZ)
+            self.enviarMensajeVoC(self.letraIZ)
         elif self.letraDR != None:
-            return self.enviarMensajeVoC(self.letraDR)
-        else:
-            return None
+            self.enviarMensajeVoC(self.letraDR)
 
     def enviarMensaje(self, pos1, pos2, letra):
         let=bytes(letra, 'utf-8')
         mensaje=struct.pack("i i c", pos1, pos2, let)
         self.emitter.send(mensaje)
+        print(mensaje)
 
     def parar(self):
         self.wheelL.setVelocity(0)
@@ -113,6 +112,7 @@ class Robot:
         self.parar()
         self.delay(1200)
         self.enviarMensaje(int(self.position.x*100), int(self.position.y*100), letra)
+        #print(f"mensaje enviado: {letra}")
 
     def girar(self, rad):
         lastRot = self.rotation
