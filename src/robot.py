@@ -6,6 +6,9 @@ from point import Point
 from image import ImageProcessor
 from controller import Robot as WebotsRobot
 
+import cv2
+
+
 TIME_STEP = 16
 MAX_VEL = 3.14 # Reduzco la velocidad para minimizar desvío
 
@@ -44,6 +47,9 @@ class Robot:
         self.position = None
         self.rotation = 0
         self.rangeImage = None
+
+
+        self.nroImagen = 0
 
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
@@ -110,10 +116,17 @@ class Robot:
 
     def enviarMensajeVoC(self, letra):
         self.parar()
-        self.delay(1200)
+        self.delay(1500)
         self.enviarMensaje(int(self.position.x*100), int(self.position.y*100), letra)
-        #print(f"mensaje enviado: {letra}")
+        self.delay(100)
 
+        self.grabar()
+        
+    def grabar(self):
+        self.nroImagen+=1
+        cv2.imwrite(f"CI{str(self.nroImagen).rjust(4,'0')}.png",self.convertirCamara(self.camI.getImage(), 64, 64))
+        cv2.imwrite(f"CD{str(self.nroImagen).rjust(4,'0')}.png",self.convertirCamara(self.camD.getImage(), 64, 64))
+        
     def girar(self, rad):
         lastRot = self.rotation
         deltaRot = 0
