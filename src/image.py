@@ -6,14 +6,23 @@ class ImageProcessor:
     def analyze(self, image):
         self.image = image
 
+    def debugShow(self, image):
+        cv2.imshow("V", image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
     def victima_o_cartel(self):
         gris = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         ret, thresh=cv2.threshold(gris, 140, 255, cv2.THRESH_BINARY)
+
+
         contornos, jerarquia = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if len(contornos) == 0:
             return None
         
         imagen = cv2.drawContours(self.image, contornos, -1, (0, 0, 255), 1)
+
+    
         approx=cv2.minAreaRect(contornos[0])
         angulo=approx[2]
 
@@ -29,7 +38,19 @@ class ImageProcessor:
             if tamanio == 0: return None
             
             pixeles_negros = np.count_nonzero(rect == 0)
+            if pixeles_negros == 0: 
+                print("CHAU porque no hay pixeles negros")
+                return None
+            
             porcentaje_negros = pixeles_negros / tamanio
+            print("Porcentaje de negros: ", porcentaje_negros)
+            if porcentaje_negros < 0.1:
+                print("CHAU porque hay muy pocos negros")
+                return None
+            
+            if abs(rect.shape[0] - rect.shape[1]) > 2:
+                print("CHAU porque no es un cuadrado")
+                return None
                 
             cuadrito_arriba = thresh[y - mitad_alto:y - int(mitad_alto / 3), x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
             cuadrito_abajo = thresh[y + int(mitad_alto / 3):y + mitad_alto, x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
