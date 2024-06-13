@@ -4,6 +4,7 @@ import struct
 import numpy as np
 from point import Point
 from image import ImageProcessor
+from floor import Tiles
 from controller import Robot as WebotsRobot
 
 import cv2
@@ -127,6 +128,20 @@ class Robot:
         cv2.imwrite(f"CI{str(self.nroImagen).rjust(4,'0')}.png",self.convertirCamara(self.camI.getImage(), 64, 64))
         cv2.imwrite(f"CD{str(self.nroImagen).rjust(4,'0')}.png",self.convertirCamara(self.camD.getImage(), 64, 64))
         
+    def Avoid_or_Not_Tiles(self):
+        b, g, r, _ = self.colorSensor.getImage()
+
+        tiles = Tiles(r, g, b)
+        
+        if tiles.What_Tile() == True:
+            self.parar()
+            self.girarDerecha90()
+            if self.hayAlgoAdelante():
+                self.girarMediaVuelta()
+            else:
+                self.avanzarBaldosa()
+
+
     def girar(self, rad):
         lastRot = self.rotation
         deltaRot = 0
