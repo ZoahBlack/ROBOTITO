@@ -89,5 +89,12 @@ class ImageProcessor:
             elif negro > 1 and (blanco + negro) > (amarillo + rojo): # b< 120 n <25
                 return "C"
             elif amarillo > 1 and (rojo + amarillo) > (negro + blanco):
-                return "O"   
-
+                return "O"  
+            
+    def see_hole(self):
+        Black_Hole = False
+        #imagen 64x64
+        #inicio agujero justo en la mitad = self.image[44,32]
+        if self.image[44,32][0] < 40 and self.image[44,32][1] < 40 and self.image[43,32][2] < 40 and self.image[44,32][2] > 40:
+            Black_Hole = True
+            return Black_Hole
