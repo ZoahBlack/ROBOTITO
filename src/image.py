@@ -11,13 +11,17 @@ class ImageProcessor:
         ret, thresh=cv2.threshold(gris, 140, 255, cv2.THRESH_BINARY)
 
         contornos, jerarquia = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # Si no es 1 contorno ya retornaría None
         if len(contornos) == 0:
             return None
         
+        # Para qué hacemos una imagen con el contorno dibujado si no lo mostramos ni lo grabamos así???
         imagen = cv2.drawContours(self.image, contornos, -1, (0, 0, 255), 1)
         approx=cv2.minAreaRect(contornos[0])
         angulo=approx[2]
 
+        #Si hiciste lo anterior, no hace falta que preguntes si es 1 contorno (si llegaste acá ya sabés que es 1)
+        # el ángulo determinará si es de víctima o de peligro
         if len(contornos) == 1 and len(contornos[0]) <= 10 and angulo % 90 == 0:
             x = int(approx[0][0])
             y = int(approx[0][1])
@@ -37,6 +41,7 @@ class ImageProcessor:
             if pixeles_negros == 0: 
                 return None
             
+            # PAra qué sirven estos 2 porcentajes que se calculan?
             porcentaje_blancos = pixeles_blancos / tamanio
             if porcentaje_blancos < 0.83:
                 return None
@@ -60,7 +65,7 @@ class ImageProcessor:
                 return "U"
             elif np.count_nonzero(cuadrito_arriba == 0) / cuadrito_arriba.size >= 0.2 and np.count_nonzero(cuadrito_abajo == 0) / cuadrito_abajo.size >= 0.2:
                 return "S"
-        elif abs(angulo) == 45 and len(contornos) == 1:
+        elif abs(angulo) == 45 and len(contornos) == 1: # Ya preguntaste si había 1 contorno.
             alto, ancho=thresh.shape[0], thresh.shape[1]
             M=cv2.getRotationMatrix2D((ancho/2,alto/2),angulo,1)
             thresh_rot=cv2.warpAffine(thresh,M,(ancho,alto))
