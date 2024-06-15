@@ -4,7 +4,7 @@ import struct
 import numpy as np
 from point import Point
 from image import ImageProcessor
-from floor import Tiles
+from floor import Tile
 from controller import Robot as WebotsRobot
 
 import cv2
@@ -44,7 +44,6 @@ class Robot:
         self.camD.enable(TIME_STEP)
 
         self.imageProcessor = ImageProcessor()
-        self.tiles = Tiles()
 
         self.position = None
         self.rotation = 0
@@ -134,15 +133,11 @@ class Robot:
         self.nroImagen+=1
         cv2.imwrite(f"CI{str(self.nroImagen).rjust(4,'0')}.png",self.convertirCamara(self.camI.getImage(), 64, 64))
         cv2.imwrite(f"CD{str(self.nroImagen).rjust(4,'0')}.png",self.convertirCamara(self.camD.getImage(), 64, 64))
-        
-    def Avoid_or_Not_Tiles(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        self.tiles.analyze(r, g, b)
-        self.hole = self.tiles.What_Tile()
-        
-        if self.hole == True:
-            return self.hole
 
+    def bh_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        tile = Tile(r, g, b)
+        return tile.is_BH()
 
     def girar(self, rad):
         lastRot = self.rotation
@@ -193,10 +188,7 @@ class Robot:
         if leftDist < 0.08:
             return True
         else:
-            if self.holeIZ == True:
-                return True
-            else:
-                return False
+            return self.holeIZ
 
     def hayAlgoDerecha(self):
         rightDist = self.rangeImage[128*3]
@@ -213,10 +205,7 @@ class Robot:
         if frontDist < 0.08:
             return True
         else:
-            if self.hole == True:
-                return True
-            else:
-                return False
+            return self.bh_ahead()
 
     def girarIzquierda90(self):
         self.girar(math.tau/4)

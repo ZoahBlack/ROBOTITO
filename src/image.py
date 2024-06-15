@@ -92,9 +92,15 @@ class ImageProcessor:
                 return "O"  
             
     def see_hole(self):
+        mitad = self.image[43:,:]
+        tamanio = mitad.shape[0]*mitad.shape[1]
+        pixeles_negros = np.count_nonzero(mitad < 31)
+        porcentaje_negros = pixeles_negros / tamanio
+
         Black_Hole = False
         #imagen 64x64
         #inicio agujero justo en la mitad = self.image[44,32]
-        if self.image[44,32][0] < 40 and self.image[44,32][1] < 40 and self.image[43,32][2] < 40 and self.image[44,32][2] > 40:
+        if porcentaje_negros <= 3 and porcentaje_negros >= 1 or pixeles_negros <= 5100 and pixeles_negros > 100:
             Black_Hole = True
-            return Black_Hole
+        
+        return Black_Hole

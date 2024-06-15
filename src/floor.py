@@ -1,8 +1,6 @@
 
-import cv2
-
-class Tiles:
-    def analyze(self, r, g, b):
+class Tile:
+    def __init__(self, r, g, b):
         self.red = r
         self.green = g
         self.blue = b
@@ -22,7 +20,7 @@ class Tiles:
             and abs(self.green) < 15 \
             and abs(self.blue) < 15
 
-    def What_Tile(self):
+    def is_BH(self):
         avoid = False
         if self.BlackHole():
             avoid = True

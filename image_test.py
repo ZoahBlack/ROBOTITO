@@ -3,6 +3,6 @@ import cv2
 
 imageProcessor = ImageProcessor()
 
-imageProcessor.analyze(cv2.imread("imgs\\CD0002 (2).png"))
+imageProcessor.analyze(cv2.imread("src\\CD0003.png"))
 
-print(imageProcessor.victima_o_cartel())
+print(imageProcessor.see_hole())
