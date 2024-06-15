@@ -29,10 +29,18 @@ class ImageProcessor:
             tamanio = rect.shape[0] * rect.shape[1]
             if tamanio == 0: return None
             
+            pixeles_blancos = np.count_nonzero(rect == 255)
+            if pixeles_blancos == 0:
+                return None
+
             pixeles_negros = np.count_nonzero(rect == 0)
             if pixeles_negros == 0: 
                 return None
             
+            porcentaje_blancos = pixeles_blancos / tamanio
+            if porcentaje_blancos < 0.83:
+                return None
+
             porcentaje_negros = pixeles_negros / tamanio
             if porcentaje_negros < 0.1:
                 return None
@@ -72,7 +80,7 @@ class ImageProcessor:
             blanco=0
             for x in range(rect.shape[0]):
                 for y in range(rect.shape[1]):
-                    b, g, r=rect[x,y]
+                    b, g, r, _=rect[x,y]
                     if b>150 and g>150 and r>150:
                         blanco+=1
                     elif b<50 and g<50 and r<50:

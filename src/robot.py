@@ -214,7 +214,8 @@ class Robot:
         self.girar(-math.tau/4)
 
     def girarMediaVuelta(self):
-        self.girar(math.tau/2)
+        self.girarIzquierda90()
+        self.girarIzquierda90()
 
     def avanzarBaldosa(self):
         self.avanzar(0.12)
