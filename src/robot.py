@@ -44,6 +44,7 @@ class Robot:
         self.camD.enable(TIME_STEP)
 
         self.imageProcessor = ImageProcessor()
+        self.tiles = Tiles()
 
         self.position = None
         self.rotation = 0
@@ -93,17 +94,23 @@ class Robot:
         w = camera.getWidth()
         h = camera.getHeight()
         return self.convertirCamara(img, h, w)
-
+    
     def updateCapturarImage(self):
         self.imageProcessor.analyze(self.getCamImage(self.camI))
         self.letraIZ = self.imageProcessor.victima_o_cartel()
+        self.holeIZ = self.imageProcessor.see_hole()
         self.imageProcessor.analyze(self.getCamImage(self.camD))
         self.letraDR = self.imageProcessor.victima_o_cartel()
+        self.holeDR = self.imageProcessor.see_hole()
         
         if self.letraIZ != None:
             self.enviarMensajeVoC(self.letraIZ)
         elif self.letraDR != None:
             self.enviarMensajeVoC(self.letraDR)
+        elif self.holeIZ != None:
+            return self.holeIZ
+        elif self.holeDR != None:
+            return self.holeDR
 
     def enviarMensaje(self, pos1, pos2, letra):
         let=bytes(letra, 'utf-8')
@@ -130,16 +137,11 @@ class Robot:
         
     def Avoid_or_Not_Tiles(self):
         b, g, r, _ = self.colorSensor.getImage()
-
-        tiles = Tiles(r, g, b)
+        self.tiles.analyze(r, g, b)
+        self.hole = self.tiles.What_Tile()
         
-        if tiles.What_Tile() == True:
-            self.parar()
-            self.girarDerecha90()
-            if self.hayAlgoAdelante():
-                self.girarMediaVuelta()
-            else:
-                self.avanzarBaldosa()
+        if self.hole == True:
+            return self.hole
 
 
     def girar(self, rad):
@@ -188,15 +190,33 @@ class Robot:
 
     def hayAlgoIzquierda(self):
         leftDist = self.rangeImage[128]
-        return leftDist < 0.08
+        if leftDist < 0.08:
+            return True
+        else:
+            if self.holeIZ == True:
+                return True
+            else:
+                return False
 
     def hayAlgoDerecha(self):
         rightDist = self.rangeImage[128*3]
-        return rightDist < 0.08
+        if rightDist < 0.08:
+            return True
+        else:
+            if self.holeDR == True:
+                return True
+            else:
+                return False
 
     def hayAlgoAdelante(self):
         frontDist = self.rangeImage[256]
-        return frontDist < 0.08
+        if frontDist < 0.08:
+            return True
+        else:
+            if self.hole == True:
+                return True
+            else:
+                return False
 
     def girarIzquierda90(self):
         self.girar(math.tau/4)
