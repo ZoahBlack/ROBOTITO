@@ -96,10 +96,10 @@ class Robot:
     
     def updateCapturarImage(self):
         self.imageProcessor.analyze(self.getCamImage(self.camI))
-        self.letraIZ = self.imageProcessor.victima_o_cartel()
+        self.letraIZ = self.imageProcessor.victim_or_sign()
         self.holeIZ = self.imageProcessor.see_hole()
         self.imageProcessor.analyze(self.getCamImage(self.camD))
-        self.letraDR = self.imageProcessor.victima_o_cartel()
+        self.letraDR = self.imageProcessor.victim_or_sign()
         self.holeDR = self.imageProcessor.see_hole()
         
         if self.letraIZ != None:
@@ -214,8 +214,11 @@ class Robot:
         self.girar(-math.tau/4)
 
     def girarMediaVuelta(self):
+        self.delay(1000)
         self.girarIzquierda90()
+        self.delay(1000)
         self.girarIzquierda90()
+        self.delay(1000)
 
     def avanzarBaldosa(self):
         self.avanzar(0.12)
