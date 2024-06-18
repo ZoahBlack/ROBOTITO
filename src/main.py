@@ -3,14 +3,15 @@ from robot import Robot
 robot = Robot() 
 
 while robot.step() != -1:
-    if not robot.hayAlgoIzquierda():
-        robot.girarIzquierda90()
-        robot.avanzarBaldosa()
-    elif not robot.hayAlgoAdelante():
-        robot.avanzarBaldosa()
-    elif not robot.hayAlgoDerecha():
-        robot.girarDerecha90()
-        robot.avanzarBaldosa()
+    robot.record()
+    if not robot.smh_Left():
+        robot.rotateLeft90()
+        robot.moveForwardTile()
+    elif not robot.smh_Ahead():
+        robot.moveForwardTile()
+    elif not robot.smh_Right():
+        robot.rotateRight90()
+        robot.moveForwardTile()
     else:
-        robot.girarMediaVuelta()
-        robot.avanzarBaldosa()
+        robot.turnAround()
+        robot.moveForwardTile()

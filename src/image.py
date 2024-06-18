@@ -14,7 +14,6 @@ class ImageProcessor:
         if len(contours) == 0:
             return None
         
-        img = cv2.drawContours(self.image, contours, -1, (0, 0, 255), 1)
         approx=cv2.minAreaRect(contours[0])
         angle=approx[2]
 

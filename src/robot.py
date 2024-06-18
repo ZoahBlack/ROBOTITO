@@ -117,19 +117,19 @@ class Robot:
         self.emitter.send(mensaje)
         print(mensaje)
 
-    def parar(self):
+    def stop(self):
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
 
     def enviarMensajeVoC(self, letra):
-        self.parar()
+        self.stop()
         self.delay(1500)
         self.enviarMensaje(int(self.position.x*100), int(self.position.y*100), letra)
         self.delay(100)
 
-        self.grabar()
+        self.record()
         
-    def grabar(self):
+    def record(self):
         self.nroImagen+=1
         cv2.imwrite(f"CI{str(self.nroImagen).rjust(4,'0')}.png",self.convertirCamara(self.camI.getImage(), 64, 64))
         cv2.imwrite(f"CD{str(self.nroImagen).rjust(4,'0')}.png",self.convertirCamara(self.camD.getImage(), 64, 64))
@@ -139,7 +139,7 @@ class Robot:
         tile = Tile(r, g, b)
         return tile.is_BH()
 
-    def girar(self, rad):
+    def turn(self, rad):
         lastRot = self.rotation
         deltaRot = 0
 
@@ -165,7 +165,7 @@ class Robot:
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
 
-    def avanzar(self, distance):
+    def moveAhead(self, distance):
         initPos = self.position
 
         while self.step() != -1:
@@ -183,14 +183,14 @@ class Robot:
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
 
-    def hayAlgoIzquierda(self):
+    def smh_Left(self):
         leftDist = self.rangeImage[128]
         if leftDist < 0.08:
             return True
         else:
             return self.holeIZ
 
-    def hayAlgoDerecha(self):
+    def smh_Right(self):
         rightDist = self.rangeImage[128*3]
         if rightDist < 0.08:
             return True
@@ -200,25 +200,27 @@ class Robot:
             else:
                 return False
 
-    def hayAlgoAdelante(self):
+    def smh_Ahead(self):
         frontDist = self.rangeImage[256]
         if frontDist < 0.08:
             return True
         else:
             return self.bh_ahead()
 
-    def girarIzquierda90(self):
-        self.girar(math.tau/4)
+    def rotateLeft90(self):
+        self.turn(math.tau/4)
 
-    def girarDerecha90(self):
-        self.girar(-math.tau/4)
+    def rotateRight90(self):
+        self.turn(-math.tau/4)
 
-    def girarMediaVuelta(self):
-        self.delay(1000)
-        self.girarIzquierda90()
-        self.delay(1000)
-        self.girarIzquierda90()
-        self.delay(1000)
+    def turnAround(self):
+        self.delay(500)
+        self.rotateLeft90()
+        self.stop()
+        self.delay(500)
+        self.rotateLeft90()
+        self.stop()
+        self.delay(500)
 
-    def avanzarBaldosa(self):
-        self.avanzar(0.12)
+    def moveForwardTile(self):
+        self.moveAhead(0.12)
