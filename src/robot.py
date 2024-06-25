@@ -95,21 +95,37 @@ class Robot:
         return self.convertirCamara(img, h, w)
     
     def updateCapturarImage(self):
-        self.imageProcessor.analyze(self.getCamImage(self.camI))
-        self.letraIZ = self.imageProcessor.victim_or_sign()
-        self.holeIZ = self.imageProcessor.see_hole()
+
+        rightDist = self.rangeImage[128*3]
+        if rightDist < 0.08:
+            self.imageProcessor.analyze(self.getCamImage(self.camD))
+            self.letraDR = self.imageProcessor.victim_or_sign()
+            if self.letraDR != None:
+                self.enviarMensajeVoC(self.letraDR)
+        else:
+            return None
+
+        leftDist = self.rangeImage[128]
+        if leftDist < 0.08:
+            self.imageProcessor.analyze(self.getCamImage(self.camI))
+            self.letraIZ = self.imageProcessor.victim_or_sign()
+            if self.letraIZ != None:
+                self.enviarMensajeVoC(self.letraIZ)
+        else:
+            return None
+
+    def updateCamImgBH_R(self):
         self.imageProcessor.analyze(self.getCamImage(self.camD))
-        self.letraDR = self.imageProcessor.victim_or_sign()
         self.holeDR = self.imageProcessor.see_hole()
-        
-        if self.letraIZ != None:
-            self.enviarMensajeVoC(self.letraIZ)
-        elif self.letraDR != None:
-            self.enviarMensajeVoC(self.letraDR)
-        elif self.holeIZ != None:
-            return self.holeIZ
-        elif self.holeDR != None:
+
+        if self.holeDR != None:
             return self.holeDR
+    
+    def updateCamImgBH_L(self):
+        self.imageProcessor.analyze(self.getCamImage(self.camI))
+        self.holeIZ = self.imageProcessor.see_hole()
+        if self.holeIZ != None:
+            return self.holeIZ
 
     def enviarMensaje(self, pos1, pos2, letra):
         let=bytes(letra, 'utf-8')
@@ -180,25 +196,21 @@ class Robot:
             if diff < 0.001:
                 break
         
-        self.wheelL.setVelocity(0)
-        self.wheelR.setVelocity(0)
+        self.stop()
 
     def smh_Left(self):
         leftDist = self.rangeImage[128]
         if leftDist < 0.08:
             return True
         else:
-            return self.holeIZ
+            return self.updateCamImgBH_L
 
     def smh_Right(self):
         rightDist = self.rangeImage[128*3]
         if rightDist < 0.08:
             return True
         else:
-            if self.holeDR == True:
-                return True
-            else:
-                return False
+            return self.updateCamImgBH_R()
 
     def smh_Ahead(self):
         frontDist = self.rangeImage[256]

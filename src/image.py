@@ -7,10 +7,22 @@ class ImageProcessor:
         self.image = image
 
     def victim_or_sign(self):
+
+        """cv2.imshow("Image", self.image)
+        cv2.waitKey(0)"""
+
         grey = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-        ret, thresh=cv2.threshold(grey, 140, 255, cv2.THRESH_BINARY)
+
+        """cv2.imshow("Image", grey)
+        cv2.waitKey(0)"""
+
+        ret, thresh=cv2.threshold(grey, 120, 255, cv2.THRESH_BINARY)
+
+        """cv2.imshow("Image", thresh)
+        cv2.waitKey(0)"""
 
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        #print(len(contours))
         if len(contours) == 0:
             return None
         
@@ -27,21 +39,13 @@ class ImageProcessor:
 
             size = rect.shape[0] * rect.shape[1]
             if size == 0: return None
-            
-            white_px = np.count_nonzero(rect == 255)
-            if white_px == 0:
-                return None
 
             black_px = np.count_nonzero(rect == 0)
             if black_px == 0: 
                 return None
-            
-            whitePercentage = white_px / size
-            if whitePercentage < 0.6:
-                return None
 
             blackPercentage = black_px / size
-            if blackPercentage < 0.1:
+            if blackPercentage < 0.15 or blackPercentage > 0.35:
                 return None
             
             if abs(rect.shape[0] - rect.shape[1]) > 2:
@@ -60,7 +64,7 @@ class ImageProcessor:
             elif np.count_nonzero(cuadrito_arriba == 0) / cuadrito_arriba.size >= 0.2 and np.count_nonzero(cuadrito_abajo == 0) / cuadrito_abajo.size >= 0.2:
                 return "S"
         
-        elif abs(angle) % 45 == 0 and len(contours) >= 1:
+        elif abs(angle) % 45 == 0 and len(contours) == 1:
             height, width=thresh.shape[0], thresh.shape[1]
             M=cv2.getRotationMatrix2D((width/2,height/2),angle,1)
             thresh_rot=cv2.warpAffine(thresh,M,(width,height))
@@ -74,6 +78,9 @@ class ImageProcessor:
             halfHeight=int(approx[1][1]/2)
             rect = image_rot[y-halfHeight:y+halfHeight, x-halfWidth:x+halfWidth]
 
+            """cv2.imshow("Image", rect)
+            cv2.waitKey(0)"""
+
             size = rect.shape[0] * rect.shape[1]
 
             black_px = np.count_nonzero(rect == 0)
@@ -81,12 +88,7 @@ class ImageProcessor:
 
             if size != 0:
                 blackPercentage = black_px / size
-                whitePercentage = white_px / size
-
-                if whitePercentage > 0.2:
-                    return None
-                
-            #print(blackPercentage, whitePercentage) # for debugging purposes, remove this line when done
+                print(blackPercentage)
 
             yellow=0
             red=0
@@ -94,13 +96,15 @@ class ImageProcessor:
             white=0
             for x in range(rect.shape[0]):
                 for y in range(rect.shape[1]):
-                    b, g, r, _=rect[x,y]
+                    b =rect[x,y][0]
+                    g =rect[x,y][1]
+                    r =rect[x,y][2]
                     if b>150 and g>150 and r>150:
                         white+=1
                     elif b<50 and g<50 and r<50:
                         black+=1
-                        if blackPercentage < 0.2 or blackPercentage > 0.3:
-                            black-=1
+                        if blackPercentage < 0.2 or blackPercentage > 0.6:
+                            black-=0.5
                     elif b>70 and g<10 and r>180:
                         red+=1
                     elif b<10 and g>180 and r>190:
@@ -114,9 +118,9 @@ class ImageProcessor:
                 return None
             elif  red > 1 and (red + white) > (black + yellow) and white > black: 
                 return "F"
-            elif black > 1 and (white + black) > (yellow + red) and white < black:
+            elif black < 20 and (white + black) > (yellow + red) and white > black:
                 return "P"
-            elif black > 1 and (white + black) > (yellow + red): # b< 120 n <25
+            elif black > 20 and (white + red) > (yellow + black): # b< 120 n <25
                 return "C"
             elif yellow > 1 and (red + yellow) > (black + white):
                 return "O"
@@ -130,7 +134,7 @@ class ImageProcessor:
         black_hole = False
         #imagen 64x64
         #inicio agujero justo en la mitad = self.image[44,32]
-        if blackPercentage <= 3 and blackPercentage >= 1 or black_px <= 5100 and black_px > 100:
+        if blackPercentage <= 0.97 and blackPercentage >= 0.85:
             black_hole = True
         
         return black_hole
