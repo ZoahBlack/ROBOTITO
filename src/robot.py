@@ -72,7 +72,7 @@ class Robot:
         self.updateRotation()
         self.updateRangeImage()
         self.updateCapturarImage()
-        #print(f"Position: {self.position}, Rotation: {self.rotation:.3f} rad ({self.rotation*180/math.pi:.3f} deg)")
+        print(f"Position: {self.position}, Rotation: {self.rotation:.3f} rad ({self.rotation*180/math.pi:.3f} deg)")
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
@@ -99,18 +99,18 @@ class Robot:
         rightDist = self.rangeImage[128*3]
         if rightDist < 0.08:
             self.imageProcessor.analyze(self.getCamImage(self.camD))
-            self.letraDR = self.imageProcessor.victim_or_sign()
-            if self.letraDR != None:
-                self.enviarMensajeVoC(self.letraDR)
+            self.letterR = self.imageProcessor.victim_or_sign()
+            if self.letterR != None:
+                self.enviarMensajeVoC(self.letterR)
         else:
             return None
 
         leftDist = self.rangeImage[128]
         if leftDist < 0.08:
             self.imageProcessor.analyze(self.getCamImage(self.camI))
-            self.letraIZ = self.imageProcessor.victim_or_sign()
-            if self.letraIZ != None:
-                self.enviarMensajeVoC(self.letraIZ)
+            self.letterL = self.imageProcessor.victim_or_sign()
+            if self.letterL != None:
+                self.enviarMensajeVoC(self.letterL)
         else:
             return None
 
@@ -131,7 +131,6 @@ class Robot:
         let=bytes(letra, 'utf-8')
         mensaje=struct.pack("i i c", pos1, pos2, let)
         self.emitter.send(mensaje)
-        print(mensaje)
 
     def stop(self):
         self.wheelL.setVelocity(0)
