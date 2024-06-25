@@ -88,7 +88,7 @@ class ImageProcessor:
 
             if size != 0:
                 blackPercentage = black_px / size
-                print(blackPercentage)
+                #print(blackPercentage)
 
             yellow=0
             red=0
@@ -110,7 +110,7 @@ class ImageProcessor:
                     elif b<10 and g>180 and r>190:
                         yellow+=1
 
-            print(yellow, red, black, white) # for debugging purposes, remove this line when done
+            #print(yellow, red, black, white) # for debugging purposes, remove this line when done
 
             if black == 0 and red == 0 and yellow == 0:
                 return None
